@@ -1,39 +1,40 @@
 pipeline {
     agent any
+
     tools {
-        maven 'Homebrew Maven'  // Varmista, että Maven on asennettu
-        jdk 'JDK11'     // Varmista, että JDK on asennettu (vaihda tarvittaessa oikeaan asennettuun versioon)
+        maven 'Homebrew Maven' // Käytä nimeä, jonka annoit asennukselle
     }
+
     stages {
-        stage('Checkout Code') {
+        stage('Checkout') {
             steps {
                 git url: 'https://github.com/annikannisto/DiceRoll.git', branch: 'main'
             }
         }
+
         stage('Build') {
             steps {
-                sh 'mvn clean package'
+                sh 'mvn clean install'
             }
         }
-        stage('Run Unit Tests') {
+
+        stage('Test') {
             steps {
                 sh 'mvn test'
             }
-            post {
-                always {
-                    junit 'target/surefire-reports/*.xml'  // Kerää testiraportit
-                }
+        }
+
+        stage('Code Coverage') {
+            steps {
+                jacoco execPattern: '**/target/jacoco.exec'
             }
         }
-        stage('Code Coverage Report') {
-            steps {
-                sh 'mvn jacoco:report'
-            }
-            post {
-                always {
-                    jacoco execPattern: 'target/jacoco.exec'
-                }
-            }
+    }
+
+    post {
+        always {
+            junit '**/target/surefire-reports/*.xml'
+            jacoco execPattern: '**/target/jacoco.exec'
         }
     }
 }
