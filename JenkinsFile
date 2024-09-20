@@ -1,8 +1,8 @@
 pipeline {
     agent any
     tools {
-        maven 'Homebrew Maven'  // Ensure Maven is installed
-        jdk 'JDK11'     // Ensure JDK is installed
+        maven 'Homebrew Maven'  // Varmista, että Maven on asennettu
+        jdk 'JDK11'     // Varmista, että JDK on asennettu (vaihda tarvittaessa oikeaan asennettuun versioon)
     }
     stages {
         stage('Checkout Code') {
@@ -12,22 +12,22 @@ pipeline {
         }
         stage('Build') {
             steps {
-                bat 'mvn clean package'
+                sh 'mvn clean package'
             }
         }
         stage('Run Unit Tests') {
             steps {
-                bat 'mvn test'
+                sh 'mvn test'
             }
             post {
                 always {
-                    junit 'target/surefire-reports/*.xml'  // Capture test reports
+                    junit 'target/surefire-reports/*.xml'  // Kerää testiraportit
                 }
             }
         }
         stage('Code Coverage Report') {
             steps {
-                bat 'mvn jacoco:report'
+                sh 'mvn jacoco:report'
             }
             post {
                 always {
@@ -37,5 +37,3 @@ pipeline {
         }
     }
 }
-
-
